@@ -1,0 +1,22 @@
+
+body {
+    font-weight: bold;
+    background-color: #f5f5f5;
+}
+.login-box {
+    background-color: #fff;
+    padding: 5px;
+    border-radius: 2px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+fieldset{
+background-color: white;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+border-radius: 10px;
+width: 400px;
+height: 270px;
+}
+a{
+color: white;
+text-decoration: none;
+}

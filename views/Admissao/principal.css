@@ -1,0 +1,73 @@
+*{
+    font-family: Arial, Helvetica, sans-serif;
+}
+.legen-car{
+    color: white;
+    margin-top: auto;
+}
+.sob_matri{
+    font-family: sans-serif;
+    font-weight: bold;
+    text-align: center
+}
+
+body{
+
+background-image: url('\Imagem\Tecnologia-1.jpg')
+}
+#navbarNav{
+    width:50%; 
+    background-color:whitesmoke;
+}
+#barra_navbar{
+font-size: 15px;
+background-color:whitesmoke;
+border-radius: 10px;
+box-shadow: 0px 0px 10px gray;
+height: 80px;
+width: 100%;
+}
+.m1{
+margin-top: 60px;
+margin-bottom: 20px;
+}
+/* EStilizaçÕ DO CARROUSSEL */
+
+
+/* Botão admissão */
+.btn-adm {
+    /* background-color: #115ccc; */
+    font-size: 15px;
+}
+/* Estilização dos daods biométricos */
+.da-bio{
+    text-decoration: none;
+    border: 2px solid;
+    color: black;
+    padding:30px;
+    border-radius:15px;
+    text-align: center;
+}
+
+/* Aqui vem a estilizaação do dados academico */
+
+.da-acad{
+    border: 2px solid;
+    text-align: right;
+    color: black;
+    padding: 30px;
+    text-align: center; 
+    border-radius:15px;
+}
+
+fieldset{
+    border: 1px solid rgba(128, 128, 128, 0.548);
+}
+
+
+#coneta{
+
+    width:35px;
+    height: 35px;
+}
+

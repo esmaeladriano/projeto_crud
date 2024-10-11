@@ -54,25 +54,99 @@ $(document).ready(function() {
     $('#search').keyup(function() {
         loadUsers(1, $(this).val());
     });
+    // //função para atualizar registro no banco de dados
+    // $('#userForm').submit(function(e) {
+    //     e.preventDefault();
+    //     var formData = new FormData(this);
+    //     formData.append('action', $('#userId').val() ? 'update' : 'add');
 
-    $('#userForm').submit(function(e) {
-        e.preventDefault();
-        var formData = new FormData(this);
-        formData.append('action', $('#userId').val() ? 'update' : 'add');
+    //     $.ajax({
+    //         url: '../controllers/UserController.php',
+    //         method: 'POST',
+    //         data: formData,
+    //         contentType: false,
+    //         processData: false,
+    //         success: function(response) {
+    //             loadUsers(currentPage);
+    //             $('#userForm')[0].reset();
+    //         }
+    //     });
+    // });
+    // Função para adicionar um novo registro
+$('#userForm').submit(function(e) {
+    e.preventDefault();
+    var formData = new FormData(this);
+    formData.append('action', 'add');
 
-        $.ajax({
-            url: '../controllers/UserController.php',
-            method: 'POST',
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function(response) {
-                loadUsers(currentPage);
-                $('#userForm')[0].reset();
-            }
-        });
+    $.ajax({
+        url: '../controllers/UserController.php',
+        method: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+            loadUsers(currentPage);
+            $('#userForm')[0].reset();
+        }
     });
+});
 
+// // Função para atualizar um registro existente
+// $('#updateUserForm').submit(function(e) {
+//     e.preventDefault();
+//     var formData = new FormData(this);
+//     formData.append('action', 'update');
+//     formData.append('id', $('#userId').val());
+
+//     $.ajax({
+//         url: '../controllers/UserController.php',
+//         method: 'POST',
+//         data: formData,
+//         contentType: false,
+//         processData: false,
+//         success: function(response) {
+//             loadUsers(currentPage);
+//             $('#updateUserForm')[0].reset();
+//         }
+//     });
+// });
+
+// Função para atualizar um registro existente
+$(document).on('click', '.editBtn', function() {
+    var id = $(this).data('id');
+    $.ajax({
+        url: '../controllers/UserController.php',
+        method: 'POST',
+        data: { action: 'getSingleUser', id: id },
+        success: function(response) {
+            var user = JSON.parse(response);
+            $('#userId').val(user.id);
+            $('#nome').val(user.nome);
+            $('#email').val(user.email);
+            $('#telefone').val(user.telefone);
+
+            // Adicione um manipulador de evento para o envio do formulário
+            $('#userForm').off('submit').submit(function(e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+                formData.append('action', 'update');
+                formData.append('id', $('#userId').val());
+
+                $.ajax({
+                    url: '../controllers/UserController.php',
+                    method: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        loadUsers(currentPage);
+                        $('#userForm')[0].reset();
+                    }
+                });
+            });
+        }
+    });
+});
     $(document).on('click', '.deleteBtn', function() {
         var id = $(this).data('id');
         $.ajax({
@@ -85,19 +159,5 @@ $(document).ready(function() {
         });
     });
 
-    $(document).on('click', '.editBtn', function() {
-        var id = $(this).data('id');
-        $.ajax({
-            url: '../controllers/UserController.php',
-            method: 'POST',
-            data: { action: 'getSingleUser', id: id },
-            success: function(response) {
-                var user = JSON.parse(response)
-                $('#userId').val(user.id);
-                $('#nome').val(user.nome);
-                $('#email').val(user.email);
-                $('#telefone').val(user.telefone);
-            }
-        });
-    });
+ 
 });

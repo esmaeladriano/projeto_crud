@@ -1,13 +1,13 @@
 <?php
-require_once '../models/DisciplinaModel.php';
+require_once '../models/disciplinaModel.php';
 
 if (isset($_POST['action'])) {
     $action = $_POST['action'];
 
     switch ($action) {
         case 'listar':
-            $offset = isset($_POST['offset']) ? $_POST['offset'] : 0;
-            $limit = isset($_POST['limit']) ? $_POST['limit'] : 10;
+            $offset = isset($_POST['offset']) ? (int)$_POST['offset'] : 0; // Garantir que é um inteiro
+            $limit = isset($_POST['limit']) ? (int)$_POST['limit'] : 10; // Garantir que é um inteiro
             $search = isset($_POST['search']) ? $_POST['search'] : '';
 
             $disciplinas = getAllDisciplinas($offset, $limit, $search);
@@ -21,13 +21,11 @@ if (isset($_POST['action'])) {
         
         case 'adicionar':
             $nome = $_POST['nome'];
-            $id_turma = $_POST['turma'];
-            $id_professor = $_POST['professor'];
             
             if (disciplinaExists($nome)) {
                 echo json_encode(['status' => 'error', 'message' => 'A disciplina já existe!']);
             } else {
-                $success = addDisciplina($nome, $id_turma, $id_professor);
+                $success = addDisciplina($nome);
                 if ($success) {
                     echo json_encode(['status' => 'success', 'message' => 'Disciplina adicionada com sucesso!']);
                 } else {
@@ -39,10 +37,8 @@ if (isset($_POST['action'])) {
         case 'editar':
             $id = $_POST['id'];
             $nome = $_POST['nome'];
-            $id_turma = $_POST['turma'];
-            $id_professor = $_POST['professor'];
             
-            $success = updateDisciplina($id, $nome, $id_turma, $id_professor);
+            $success = updateDisciplina($id, $nome);
             if ($success) {
                 echo json_encode(['status' => 'success', 'message' => 'Disciplina atualizada com sucesso!']);
             } else {
@@ -65,16 +61,6 @@ if (isset($_POST['action'])) {
             $id = $_POST['id'];
             $disciplina = getDisciplinaById($id);
             echo json_encode(['disciplina' => $disciplina]);
-            break;
-        
-        case 'getTurmas':
-            $turmas = getTurmas();
-            echo json_encode($turmas);
-            break;
-        
-        case 'getProfessores':
-            $professores = getProfessores();
-            echo json_encode($professores);
             break;
 
         default:

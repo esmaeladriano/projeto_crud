@@ -44,8 +44,8 @@
         <button id="prevPage">Anterior</button>
         <button id="nextPage">Próximo</button>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../public/jquery-3.6.0.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
     <script src="../public/ajax.js"></script>
 </body>
 </html>

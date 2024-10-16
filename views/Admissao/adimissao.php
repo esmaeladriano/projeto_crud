@@ -6,8 +6,22 @@ function sendResponse($status, $message) {
     echo json_encode(['status' => $status, 'message' => $message]);
     exit; // Finaliza a execução do script após enviar a resposta
 }
+function uploadFile($file, $destination) {
+    if (!file_exists($destination)) {
+        mkdir($destination, 0777, true);
+    }
 
-if (isset($_POST['action']) && $_POST['action'] === 'submit') {
+    $fileName = uniqid() . '_' . basename($file['name']);
+    $targetFile = $destination . $fileName;
+
+    if (move_uploaded_file($file['tmp_name'], $targetFile)) {
+        return $targetFile;
+    } else {
+        return false;
+    }
+}
+
+if (isset($_POST['nome'])) {
     $nome = $_POST['nome'];
     $data = $_POST['data'];
     $nomeP = $_POST['nomeP'];
@@ -51,20 +65,25 @@ if (isset($_POST['action']) && $_POST['action'] === 'submit') {
         sendResponse('error', 'Só é aceita a extensão PDF.');
     }
 
-    // Move os arquivos para as pastas
-    $pasta_certificado = "cerificado/";
-    $pasta_copia_BI = "copiaBI/";
-    $novoNome_arquivo_certificado = uniqid() . '.' . $extensao_certificado;
-    $novoNome_arquivo_copia_BI = uniqid() . '.' . $extensao_copia_BI;
-    $path_certificado = $pasta_certificado . $novoNome_arquivo_certificado;
-    $path_copia_BI = $pasta_copia_BI . $novoNome_arquivo_copia_BI;
+    // // Move os arquivos para as pastas
+    // $pasta_certificado = "cerificado/";
+    // $pasta_copia_BI = "../uploads/candidatura/" . date('Y') . '/certificado/';
+    // $novoNome_arquivo_certificado = uniqid() . '.' . $extensao_certificado;
+    // $novoNome_arquivo_copia_BI = uniqid() . '.' . $extensao_copia_BI;
+    // $path_certificado = $pasta_certificado . $novoNome_arquivo_certificado;
+    // $path_copia_BI = $pasta_copia_BI . $novoNome_arquivo_copia_BI;
+    $bi_path = uploadFile($copia_BI, '../../uploads/candidatura/' . date('Y') . '/bi/');
+    $certificado_path = uploadFile($certificado, '../../uploads/candidatura/' . date('Y') . '/certificado/');
 
-    if (move_uploaded_file($certificado['tmp_name'], $path_certificado) && move_uploaded_file($copia_BI['tmp_name'], $path_copia_BI)) {
+    // Verifica se houve erro no upload
+    if (!$bi_path || !$certificado_path) {
+        return ['status' => 'error', 'message' => 'Erro no upload dos arquivos!'];
+    }
         // Insere os dados no banco
         $insert = "INSERT INTO `candidatura` (`nome`, `Data_nasc`, `Nome_pai`, `Nome_mae`, `Municipio`, `Sexo`, `BI`, `Estado_civil`, `email`, `Contacto_aluno`, `Contacto_enca1`, `Contacto_enca2`, `Classe`, `Curso`, `certificado`, `copia_BI`) 
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conexao->prepare($insert);
-        $stmt->bind_param("ssssssssssssssss", $nome, $data, $nomeP, $nomeM, $muni, $sexo, $BI, $estado, $email, $nfone_aluno, $nume1, $nume2, $classe, $curso, $path_certificado, $path_copia_BI);
+        $stmt->bind_param("ssssssssssssssss", $nome, $data, $nomeP, $nomeM, $muni, $sexo, $BI, $estado, $email, $nfone_aluno, $nume1, $nume2, $classe, $curso, $bi_path, $certificado_path);
         
         if ($stmt->execute()) {
             sendResponse('success', 'Inscrição realizada com sucesso.');
@@ -74,7 +93,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'submit') {
     } else {
         sendResponse('error', 'Erro ao mover os arquivos.');
     }
-}
 
 
 ?>

@@ -1,77 +1,87 @@
 <?php
-require_once '../models/TurmaModel.php';
+require_once '../models/TurmaModel.php'; // Certifique-se de que o modelo está corretamente incluído
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if (isset($_POST['action'])) {
     $action = $_POST['action'];
 
     switch ($action) {
-        case 'getTurmas':
-            $offset = $_POST['offset'];
-            $limit = $_POST['limit'];
-            $search = $_POST['search'];
-            $turmas = getAllTurmas($offset, $limit, $search);
-            $total = getTurmaCount($search);
-            echo json_encode(['turmas' => $turmas, 'total' => $total]);
-            break;
+        case 'listar':
+            $offset = isset($_POST['offset']) ? $_POST['offset'] : 0;
+            $limit = isset($_POST['limit']) ? $_POST['limit'] : 10;
+            $search = isset($_POST['search']) ? $_POST['search'] : '';
 
-        case 'add':
-            $nome = $_POST['nome'];
-            $id_curso = $_POST['id_curso'];
-            $id_classe = $_POST['id_classe'];
-            $id_turno = $_POST['id_turno'];
+            $turmas = getAllTurmas($offset, $limit, $search);
+            $totalTurmas = getTurmaCount($search);
+
+            echo json_encode([
+                'turmas' => $turmas,
+                'total' => $totalTurmas
+            ]);
+            break;
         
-            // Verificar se a turma já existe
+        case 'adicionar':
+            $nome = $_POST['nome'];
+            $id_classe = $_POST['id_classe']; // Obtém o ID da classe
+            $id_curso = $_POST['id_curso']; // Obtém o ID do curso
+            $ano = $_POST['ano']; // Obtém o ano
+
+            // Verifica se a turma já existe
             if (turmaExists($nome)) {
-                echo json_encode(['success' => false, 'message' => 'A turma já existe!']);
+                echo json_encode(['status' => 'error', 'message' => 'A turma já existe!']);
             } else {
-                // Adicione a turma
-                if (addTurma($nome, $id_curso, $id_classe, $id_turno)) {
-                    echo json_encode(['success' => true, 'message' => 'Turma adicionada com sucesso!']);
+                $success = addTurma($nome, $id_classe, $id_curso, $ano);
+                if ($success) {
+                    echo json_encode(['status' => 'success', 'message' => 'Turma adicionada com sucesso!']);
                 } else {
-                    echo json_encode(['success' => false, 'message' => 'Erro ao adicionar a turma.']);
+                    echo json_encode(['status' => 'error', 'message' => 'Erro ao adicionar a turma!']);
                 }
             }
             break;
-            
-        case 'update':
+        
+        case 'editar':
             $id = $_POST['id'];
             $nome = $_POST['nome'];
-            $id_curso = $_POST['id_curso'];
             $id_classe = $_POST['id_classe'];
-            $id_turno = $_POST['id_turno'];
-            updateTurma($id, $nome, $id_curso, $id_classe, $id_turno);
-            echo json_encode(['status' => 'success']);
-            break;
+            $id_curso = $_POST['id_curso'];
+            $ano = $_POST['ano'];
 
-        case 'delete':
+            $success = updateTurma($id, $nome, $id_classe, $id_curso, $ano);
+            if ($success) {
+                echo json_encode(['status' => 'success', 'message' => 'Turma atualizada com sucesso!']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Erro ao atualizar a turma!']);
+            }
+            break;
+        
+        case 'deletar':
             $id = $_POST['id'];
-            deleteTurma($id);
-            echo json_encode(['status' => 'success']);
+            
+            $success = deleteTurma($id);
+            if ($success) {
+                echo json_encode(['status' => 'success', 'message' => 'Turma deletada com sucesso!']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Erro ao deletar a turma!']);
+            }
             break;
-
-        case 'getSingleTurma':
+        
+        case 'detalhes':
             $id = $_POST['id'];
             $turma = getTurmaById($id);
-            echo json_encode($turma);
-            break;
-
-        case 'getCursos':
-            $cursos = getCursos();
-            echo json_encode($cursos);
+            echo json_encode(['turma' => $turma]);
             break;
 
         case 'getClasses':
-            $classes = getClasses();
-            echo json_encode($classes);
+            $classes = getAllClasses(); // Função para obter todas as classes
+            echo json_encode(['classes' => $classes]);
             break;
 
-        case 'getTurnos':
-            $turnos = getTurnos();
-            echo json_encode($turnos);
+        case 'getCursos':
+            $cursos = getAllCursos(); // Função para obter todos os cursos
+            echo json_encode(['cursos' => $cursos]);
             break;
 
         default:
-            echo json_encode(['status' => 'error', 'message' => 'Ação inválida']);
+            echo json_encode(['status' => 'error', 'message' => 'Ação inválida!']);
             break;
     }
 }

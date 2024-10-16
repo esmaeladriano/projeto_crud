@@ -1,7 +1,7 @@
 <?php
 class Database {
     private $host = 'localhost';
-    private $dbname = 'impar';
+    private $dbname = 'sistema_escolar';
     private $username = 'root';
     private $password = '';
     private $conn;
